@@ -47,9 +47,17 @@ def extract_audio_features(file):
 def predict():
     """Predict genre of music using a trained model"""
     music_file = request.files["audioFile"]
-    prediction = trained_model.predict(extract_audio_features(music_file))
-    genre = GenreFeatureData.genre_list[np.argmax(prediction)]
-    return {"genre": genre}, 200
+    predictions = trained_model.predict(extract_audio_features(music_file))[0]
+    genre = GenreFeatureData.genre_list[np.argmax(predictions)]
+    predictions = map(lambda x: x * 100, predictions)
+    return {
+        "genre": genre,
+        "predictions": [["genre", "percentage"]] + list(
+            # Predictions are in float32 dtype, but only float64 can be
+            # converted to JSON.
+            zip(GenreFeatureData.genre_list, map(np.float64, predictions))
+        )
+    }, 200
 
 
 if __name__ == "__main__":
