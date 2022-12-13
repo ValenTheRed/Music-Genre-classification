@@ -47,8 +47,8 @@ def extract_audio_features(file):
 def predict():
     """Predict genre of music using a trained model"""
     music_file = request.files["audioFile"]
-    prediction = trained_model.predict(extract_audio_features(music_file))
-    genre = GenreFeatureData.genre_list[np.argmax(prediction)]
+    predictions = trained_model.predict(extract_audio_features(music_file))[0]
+    genre = GenreFeatureData.genre_list[np.argmax(predictions)]
     return {"genre": genre}, 200
 
 
